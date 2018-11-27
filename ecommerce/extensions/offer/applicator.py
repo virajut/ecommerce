@@ -1,11 +1,8 @@
 import logging
 from itertools import chain
 
-import waffle
 from oscar.apps.offer.applicator import Applicator
 from oscar.core.loading import get_model
-
-from ecommerce.extensions.offer.constants import CUSTOM_APPLICATOR_LOG_FLAG
 
 logger = logging.getLogger(__name__)
 BasketAttribute = get_model('basket', 'BasketAttribute')
@@ -43,17 +40,7 @@ class CustomApplicator(Applicator):
         if bundle_attributes.count() > 0:
             program_offers = self.get_program_offers(bundle_attributes.first())
             site_offers = []
-            if waffle.flag_is_active(request, CUSTOM_APPLICATOR_LOG_FLAG):
-                logger.warning(
-                    'CustomApplicator processed Basket [%s] from Request [%s] and User [%s] with a bundle.',
-                    basket, request, user,
-                )
         else:
-            if waffle.flag_is_active(request, CUSTOM_APPLICATOR_LOG_FLAG):
-                logger.warning(
-                    'CustomApplicator processed Basket [%s] from Request [%s] and User [%s] without a bundle.',
-                    basket, request, user,
-                )
             program_offers = []
             site_offers = self.get_site_offers()
 
@@ -63,7 +50,6 @@ class CustomApplicator(Applicator):
         # The default oscar implementations which return [] are here in case edX ever starts using these offers.
         user_offers = self.get_user_offers(user)
         session_offers = self.get_session_offers(request)
-
         return list(
             sorted(
                 chain(session_offers, basket_offers, user_offers, program_offers, site_offers),
@@ -77,7 +63,7 @@ class CustomApplicator(Applicator):
         Return site offers that are available to baskets without bundle ids.
         """
         ConditionalOffer = get_model('offer', 'ConditionalOffer')
-        qs = ConditionalOffer.active.filter(offer_type=ConditionalOffer.SITE, condition__program_uuid__isnull=True)
+        qs = ConditionalOffer.active.filter(offer_type=ConditionalOffer.SITE)
         return qs.select_related('condition', 'benefit')
 
     def get_program_offers(self, bundle_attribute):
