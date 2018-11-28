@@ -37,13 +37,16 @@ class CustomApplicator(Applicator):
             basket=basket,
             attribute_type=BasketAttributeType.objects.get(name=BUNDLE)
         )
-        if bundle_attributes.count() > 0:
+        if request.path == u'/checkout/free-checkout/':
+            # TODO Enterprise to handle free checkout case
+            program_offers = []
+            site_offers = self.get_site_offers()
+        elif bundle_attributes.count() > 0:
             program_offers = self.get_program_offers(bundle_attributes.first())
             site_offers = []
         else:
             program_offers = []
             site_offers = self.get_site_offers()
-
         basket_offers = self.get_basket_offers(basket, user)
 
         # edX currently does not use user offers or session offers.
