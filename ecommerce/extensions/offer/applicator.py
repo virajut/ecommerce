@@ -37,7 +37,7 @@ class CustomApplicator(Applicator):
             basket=basket,
             attribute_type=BasketAttributeType.objects.get(name=BUNDLE)
         )
-        if request.path == u'/checkout/free-checkout/':
+        if request.path and request.path == u'/checkout/free-checkout/':
             # TODO Enterprise to handle free checkout case
             program_offers = []
             site_offers = self.get_site_offers()
