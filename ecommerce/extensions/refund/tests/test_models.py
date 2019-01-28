@@ -400,7 +400,7 @@ class RefundTests(RefundTestMixin, StatusTestsMixin, TestCase):
 
         user = UserFactory()
 
-        course_entitlement = create_or_update_course_entitlement(
+        course_entitlement, __ = create_or_update_course_entitlement(
             'verified', 100, self.partner, '111-222-333-444', 'Course Entitlement')
         basket = create_basket(site=self.site, owner=user, empty=True)
         basket.add_product(course_entitlement, 1)

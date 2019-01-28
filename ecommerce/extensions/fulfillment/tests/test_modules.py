@@ -571,7 +571,7 @@ class EntitlementFulfillmentModuleTests(FulfillmentTestMixin, TestCase):
     def setUp(self):
         super(EntitlementFulfillmentModuleTests, self).setUp()
         self.user = factories.UserFactory()
-        self.course_entitlement = create_or_update_course_entitlement(
+        self.course_entitlement, _sku = create_or_update_course_entitlement(
             'verified', 100, self.partner, '111-222-333-444', 'Course Entitlement')
         basket = factories.BasketFactory(owner=self.user, site=self.site)
         basket.add_product(self.course_entitlement, 1)

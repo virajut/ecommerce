@@ -42,25 +42,27 @@ def create_parent_course_entitlement(name, UUID):
     return parent, created
 
 
-def create_or_update_course_entitlement(certificate_type, price, partner, UUID, name, id_verification_required=False):
-    """ Create or Update Course Entitlement Products """
-
-    certificate_type = certificate_type.lower()
-    UUID = unicode(UUID)
-
+def get_entitlement(uuid, certificate_type):
+    """ Get a Course Entitlement Product """
     uuid_query = Q(
         attributes__name='UUID',
-        attribute_values__value_text=UUID,
+        attribute_values__value_text=unicode(uuid),
     )
     certificate_type_query = Q(
         attributes__name='certificate_type',
-        attribute_values__value_text=certificate_type,
+        attribute_values__value_text=certificate_type.lower(),
     )
+    return Product.objects.filter(uuid_query).get(certificate_type_query)
+
+
+def create_or_update_course_entitlement(certificate_type, price, partner, UUID, name, id_verification_required=False):
+    """ Create or Update Course Entitlement Products """
+    certificate_type = certificate_type.lower()
+    UUID = unicode(UUID)
 
     try:
         parent_entitlement, __ = create_parent_course_entitlement(name, UUID)
-        all_products = parent_entitlement.children.all().prefetch_related('stockrecords')
-        course_entitlement = all_products.filter(uuid_query).get(certificate_type_query)
+        course_entitlement = get_entitlement(UUID, certificate_type)
     except Product.DoesNotExist:
         course_entitlement = Product()
 
@@ -73,22 +75,24 @@ def create_or_update_course_entitlement(certificate_type, price, partner, UUID, 
     course_entitlement.parent = parent_entitlement
     course_entitlement.save()
 
-    StockRecord.objects.update_or_create(
+    sku = generate_sku(course_entitlement, partner)
+    __, created = StockRecord.objects.update_or_create(
         product=course_entitlement, partner=partner,
         defaults={
             'product': course_entitlement,
             'partner': partner,
-            'partner_sku': generate_sku(course_entitlement, partner),
+            'partner_sku': sku,
             'price_excl_tax': price,
             'price_currency': settings.OSCAR_DEFAULT_CURRENCY,
         }
     )
 
-    logger.info(
-        'Course entitlement product stock record with certificate type [%s] for [%s] does not exist. '
-        'Instantiated a new instance.',
-        certificate_type,
-        UUID
-    )
+    if created:
+        logger.info(
+            'Course entitlement product stock record with certificate type [%s] for [%s] does not exist. '
+            'Instantiated a new instance.',
+            certificate_type,
+            UUID
+        )
 
-    return course_entitlement
+    return course_entitlement, sku

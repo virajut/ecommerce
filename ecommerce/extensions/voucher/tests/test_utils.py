@@ -80,7 +80,7 @@ class UtilTests(CouponMixin, DiscoveryMockMixin, DiscoveryTestMixin, LmsApiMockM
         )
         self.coupon_vouchers = CouponVouchers.objects.filter(coupon=self.coupon)
 
-        self.entitlement = create_or_update_course_entitlement(
+        self.entitlement, _sku = create_or_update_course_entitlement(
             'verified', 100, self.partner, 'foo-bar', 'Foo Bar Entitlement'
         )
         self.entitlement_stock_record = StockRecord.objects.filter(product=self.entitlement).first()

@@ -57,7 +57,7 @@ class UtilsTests(DiscoveryTestMixin, DiscoveryMockMixin, TestCase):
                 course, discovery_api_url=self.site_configuration.discovery_api_url
             )
         else:
-            product = create_or_update_course_entitlement(
+            product, _sku = create_or_update_course_entitlement(
                 'verified', 100, self.partner, 'foo-bar', 'Foo Bar Entitlement')
             key = product.attr.UUID
             self.mock_course_detail_endpoint(product, discovery_api_url=self.site_configuration.discovery_api_url)
@@ -87,7 +87,7 @@ class UtilsTests(DiscoveryTestMixin, DiscoveryMockMixin, TestCase):
             - the result being cached
         """
         self.mock_access_token_response()
-        product = create_or_update_course_entitlement(
+        product, _sku = create_or_update_course_entitlement(
             'verified', 100, self.partner, 'foo-bar', 'Foo Bar Entitlement')
         self.mock_course_detail_endpoint(product, discovery_api_url=self.site_configuration.discovery_api_url)
 

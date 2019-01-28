@@ -27,7 +27,7 @@ class ProgramTestMixin(DiscoveryTestMixin):
             courses = []
             for i in range(1, 5):
                 uuid = '268afbfc-cc1e-415b-a5d8-c58d955bcfc' + str(i)
-                entitlement = create_or_update_course_entitlement('verified', 10, partner, uuid, uuid)
+                _entitlement, sku = create_or_update_course_entitlement('verified', 10, partner, uuid, uuid)
                 entitlements = []
                 if include_entitlements:
                     entitlements.append(
@@ -35,7 +35,7 @@ class ProgramTestMixin(DiscoveryTestMixin):
                             "mode": "verified",
                             "price": "10.00",
                             "currency": "USD",
-                            "sku": entitlement.stockrecords.first().partner_sku
+                            "sku": sku,
                         }
                     )
                 key = 'course-v1:test-org+course+' + str(i)

@@ -548,7 +548,7 @@ class BasketSummaryViewTests(EnterpriseServiceMockMixin, DiscoveryTestMixin, Dis
     def test_order_details_entitlement_msg(self):
         """Verify the order details message is displayed for course entitlements."""
 
-        product = create_or_update_course_entitlement(
+        product, _sku = create_or_update_course_entitlement(
             'verified', 100, self.partner, 'foo-bar', 'Foo Bar Entitlement')
 
         self.assert_order_details_in_context(product)

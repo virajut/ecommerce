@@ -460,7 +460,7 @@ class BasketUtilsTests(DiscoveryTestMixin, BasketMixin, TestCase):
         __, seat, enrollment_code = self.prepare_course_seat_and_enrollment_code()
         seat_sku = StockRecord.objects.get(product=seat).partner_sku
         ec_sku = StockRecord.objects.get(product=enrollment_code).partner_sku
-        entitlement = create_or_update_course_entitlement(
+        entitlement, _sku = create_or_update_course_entitlement(
             'verified', 100, self.partner, 'foo-bar', 'Foo Bar Entitlement')
 
         __, partner_sku = get_basket_switch_data(seat)
