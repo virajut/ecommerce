@@ -26,7 +26,7 @@ class CurrentSiteDjangoStrategyTests(TestCase):
 
     def test_get_setting_from_siteconfiguration(self):
         """Test that a setting can be retrieved from the site configuration."""
-        setting_name = 'SOCIAL_AUTH_EDX_OIDC_KEY'
+        setting_name = 'SOCIAL_AUTH_EDX_OAUTH2_KEY'
         expected = str(uuid.uuid4())
         self.site.siteconfiguration.oauth_settings[setting_name] = expected
         self.site.siteconfiguration.save()
@@ -35,7 +35,7 @@ class CurrentSiteDjangoStrategyTests(TestCase):
 
     def test_get_setting_from_django_settings(self):
         """Test that a setting can be retrieved from django settings if it doesn't exist in site configuration."""
-        setting_name = 'SOCIAL_AUTH_EDX_OIDC_SECRET'
+        setting_name = 'SOCIAL_AUTH_EDX_OAUTH2_SECRET'
         expected = str(uuid.uuid4())
 
         if setting_name in self.site.siteconfiguration.oauth_settings:
@@ -57,18 +57,18 @@ class CurrentSiteDjangoStrategyTests(TestCase):
         Returns:
             str: JWS
         """
-        key = SYMKey(key=self.site.siteconfiguration.oauth_settings['SOCIAL_AUTH_EDX_OIDC_SECRET'])
+        key = SYMKey(key=self.site.siteconfiguration.oauth_settings['SOCIAL_AUTH_EDX_OAUTH2_SECRET'])
         now = datetime.datetime.utcnow()
         expiration_datetime = now + datetime.timedelta(seconds=3600)
         issue_datetime = now
         payload = {
-            'iss': self.site.siteconfiguration.oauth2_provider_url,
+            'iss': self.site.siteconfiguration.lms_url_root,
             'administrator': False,
             'iat': timegm(issue_datetime.utctimetuple()),
             'given_name': user.first_name,
             'sub': str(uuid.uuid4()),
             'preferred_username': user.username,
-            'aud': self.site.siteconfiguration.oauth_settings['SOCIAL_AUTH_EDX_OIDC_KEY'],
+            'aud': self.site.siteconfiguration.oauth_settings['SOCIAL_AUTH_EDX_OAUTH2_KEY'],
             'email': user.email,
             'exp': timegm(expiration_datetime.utctimetuple()),
             'name': user.get_full_name(),
@@ -83,11 +83,10 @@ class CurrentSiteDjangoStrategyTests(TestCase):
         a UUID. This validates the fix made by https://github.com/python-social-auth/social-core/pull/74.
         """
         self.site.siteconfiguration.oauth_settings = {
-            'SOCIAL_AUTH_EDX_OIDC_KEY': 'test-key',
-            'SOCIAL_AUTH_EDX_OIDC_SECRET': 'test-secret',
-            'SOCIAL_AUTH_EDX_OIDC_URL_ROOT': self.site.siteconfiguration.oauth2_provider_url,
-            'SOCIAL_AUTH_EDX_OIDC_ID_TOKEN_DECRYPTION_KEY': 'test-secret',
-            'SOCIAL_AUTH_EDX_OIDC_ISSUER': self.site.siteconfiguration.oauth2_provider_url,
+            'SOCIAL_AUTH_EDX_OAUTH2_KEY': 'test-key',
+            'SOCIAL_AUTH_EDX_OAUTH2_SECRET': 'test-secret',
+            'SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT': self.site.siteconfiguration.lms_url_root,
+            'SOCIAL_AUTH_EDX_OAUTH2_ISSUER': self.site.siteconfiguration.lms_url_root,
 
         }
         self.site.siteconfiguration.save()
@@ -107,9 +106,9 @@ class CurrentSiteDjangoStrategyTests(TestCase):
         # Simulate login completion
         state = str(uuid.uuid4())
         session = self.client.session
-        session['edx-oidc_state'] = state
+        session['edx-oauth2_state'] = state
         session.save()
-        url = '{host}?state={state}'.format(host=reverse('social:complete', args=['edx-oidc']), state=state)
+        url = '{host}?state={state}'.format(host=reverse('social:complete', args=['edx-oauth2']), state=state)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 

@@ -271,8 +271,10 @@ class SiteMixin(object):
         self.site_configuration = SiteConfigurationFactory(
             from_email='from@example.com',
             oauth_settings={
-                'SOCIAL_AUTH_EDX_OIDC_KEY': 'key',
-                'SOCIAL_AUTH_EDX_OIDC_SECRET': 'secret'
+                'SOCIAL_AUTH_EDX_OAUTH2_KEY': 'key',
+                'SOCIAL_AUTH_EDX_OAUTH2_SECRET': 'secret',
+                'BACKEND_SERVICE_EDX_OAUTH2_KEY': 'key',
+                'BACKEND_SERVICE_EDX_OAUTH2_SECRET': 'secret',
             },
             partner__name='edX',
             partner__short_code='edx',
