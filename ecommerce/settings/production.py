@@ -86,8 +86,7 @@ for __, configs in PAYMENT_PROCESSOR_CONFIG.iteritems():
 ENTERPRISE_API_URL = urljoin(ENTERPRISE_SERVICE_URL, 'api/v1/')
 
 CORS_ORIGIN_WHITELIST = environ.get('CORS_ORIGIN_WHITELIST', ())
-# YOU NEED TO DO SOMETHING HERE ABOUT ONLY ALLOWING CORS ON AN EXACT PATH FOR API THOUGH
-# DO NOT MERGE UNTIL WE HAVE DONE THAT
+CORS_URLS_REGEX = r'{regex}'.format(regex=environ.get('CORS_URLS_REGEX', ''))
 CORS_ALLOW_HEADERS = corsheaders_default_headers + (
     'use-jwt-cookie',
 )
