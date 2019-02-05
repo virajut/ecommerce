@@ -90,6 +90,4 @@ CORS_URLS_REGEX = r'{regex}'.format(regex=environ.get('CORS_URLS_REGEX', ''))
 CORS_ALLOW_HEADERS = corsheaders_default_headers + (
     'use-jwt-cookie',
 )
-CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_ALLOW_ALL = environ.get('CORS_ORIGIN_ALLOW_ALL', False)
-CORS_ALLOW_INSECURE = environ.get('CORS_ALLOW_INSECURE', False)
+CORS_ALLOW_CREDENTIALS = environ.get('CORS_ALLOW_CREDENTIALS', False)
